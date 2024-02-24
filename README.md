@@ -1,66 +1,44 @@
-<img src='imgs/teaser.gif' align="right" width=360>
+# Vid2Vid for CARLA Simulator
 
-<br><br><br><br>
+This is a modfied version of the [Vid2Vid project](https://github.com/NVIDIA/vid2vid/tree/master) that enables it's real-time execution in the CARLA simulator.
+<br>
 
-# vid2vid
-### [Project](https://tcwang0509.github.io/vid2vid/) | [YouTube(short)](https://youtu.be/5zlcXTCpQqM) | [YouTube(full)](https://youtu.be/GrP_aOSXt5U) | [arXiv](https://arxiv.org/abs/1808.06601) | [Paper(full)](https://tcwang0509.github.io/vid2vid/paper_vid2vid.pdf)
+<div align="center">
+  <img src="https://drive.google.com/thumbnail?id=1vUrKl1oW2SHlSSW5CXPBC48b5JRrnoQF&sz=w1000" alt="Image" width="400px" height="auto">
+  <img src="https://drive.google.com/thumbnail?id=1COhU07s-QXG_PR49J4o0dkm2eR3Pr7a4&sz=w1000" alt="Image" width="400px" height="auto">
+</div>
 
-Pytorch implementation for high-resolution (e.g., 2048x1024) photorealistic video-to-video translation. It can be used for turning semantic label maps into photo-realistic videos, synthesizing people talking from edge maps, or generating human motions from poses. The core of video-to-video translation is image-to-image translation. Some of our work in that space can be found in [pix2pixHD](https://github.com/NVIDIA/pix2pixHD) and [SPADE](https://github.com/NVlabs/SPADE). <br><br>
-[Video-to-Video Synthesis](https://tcwang0509.github.io/vid2vid/)  
- [Ting-Chun Wang](https://tcwang0509.github.io/)<sup>1</sup>, [Ming-Yu Liu](http://mingyuliu.net/)<sup>1</sup>, [Jun-Yan Zhu](http://people.csail.mit.edu/junyanz/)<sup>2</sup>, [Guilin Liu](https://liuguilin1225.github.io/)<sup>1</sup>, Andrew Tao<sup>1</sup>, [Jan Kautz](http://jankautz.com/)<sup>1</sup>, [Bryan Catanzaro](http://catanzaro.name/)<sup>1</sup>  
- <sup>1</sup>NVIDIA Corporation, <sup>2</sup>MIT CSAIL  
- In Neural Information Processing Systems (**NeurIPS**) 2018  
+## Features
 
-## Video-to-Video Translation
-- Label-to-Streetview Results
-<p align='center'>  
-  <img src='imgs/city_change_styles.gif' width='440'/>  
-  <img src='imgs/city_change_labels.gif' width='440'/>
-</p>
-
-- Edge-to-Face Results
-<p align='center'>
-  <img src='imgs/face.gif' width='440'/>
-  <img src='imgs/face_multiple.gif' width='440'/>
-</p>
-
-- Pose-to-Body Results
-<p align='center'>
-  <img src='imgs/pose.gif' width='550'/>
-</p>
-
-- Frame Prediction Results
-<p align='center'>
-  <img src='imgs/framePredict.gif' width='550'/>
-</p>
+* Code for running Vid2Vid in CARLA simulator in real-time.
+* Code for extracting a synthetic dataset in synchronous mode (RGB Frame, Synthesized Frame, Instance Segmentation, and Semantic Segmentation).
+* Support for synchronous and asynchronous modes.
+* Parameterization from a yaml config file rather than directly interacting with the code.
 
 ## Prerequisites
-- Linux or macOS
+- Linux or macOS or Windows
+- [CARLA version 0.9.14](https://carla.org/2022/12/23/release-0.9.14/) or higher (older versions do not follow the Cityscapes labeling scheme).
 - Python 3
 - NVIDIA GPU + CUDA cuDNN
 - PyTorch 0.4
 
-
-## Getting Started
 ### Installation
 - Install python libraries [dominate](https://github.com/Knio/dominate) and requests.
 ```bash
 pip install dominate requests
+pip install numpy
+pip install carla
+pip install opencv-python
+pip install pillow
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 ```
-- If you plan to train with face datasets, please install dlib.
-```bash
-pip install dlib
-```
-- If you plan to train with pose datasets, please install [DensePose](https://github.com/facebookresearch/DensePose) and/or [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose).
 - Clone this repo:
 ```bash
-git clone https://github.com/NVIDIA/vid2vid
-cd vid2vid
+git clone https://github.com/stefanos50/CARLA-vid2vid
+cd CARLA-vid2vid
 ```
-- Docker Image
-If you have difficulty building the repo, a docker image can be found in the `docker` folder.
 
-### Testing 
+### Real-Time Execution 
 - Please first download example dataset by running `python scripts/download_datasets.py`.
 - Next, compile a snapshot of [FlowNet2](https://github.com/NVIDIA/flownet2-pytorch) by running `python scripts/download_flownet2.py`.
 - Cityscapes    
@@ -68,36 +46,66 @@ If you have difficulty building the repo, a docker image can be found in the `do
     ```bash
     python scripts/street/download_models.py
     ```
-  - To test the model (`bash ./scripts/street/test_2048.sh`):
+  - To test the model (`bash ./scripts/street/test_2048.sh`)
+  - Execute tha CARLA.exe (executable) and wait until the world is initialized.
+  - Execute the following command:
     ```bash
     #!./scripts/street/test_2048.sh
     python test.py --name label2city_2048 --label_nc 35 --loadSize 2048 --n_scales_spatial 3 --use_instance --fg --use_single_G
     ```
-    The test results will be saved in: `./results/label2city_2048/test_latest/`.
+    The test results will be saved in: `./datasets/Carla/`.
 
-  - We also provide a smaller model trained with single GPU, which produces slightly worse performance at 1024 x 512 resolution.
-    - Please download the model by
-    ```bash
-    python scripts/street/download_models_g1.py
-    ```
-    - To test the model (`bash ./scripts/street/test_g1_1024.sh`):
-    ```bash
-    #!./scripts/street/test_g1_1024.sh
-    python test.py --name label2city_1024_g1 --label_nc 35 --loadSize 1024 --n_scales_spatial 3 --use_instance --fg --n_downsample_G 2 --use_single_G
-    ```
-  - You can find more example scripts in the `scripts/street/` directory.
+### Configuration
 
-- Faces
-  - Please download the pre-trained model by:
-    ```bash
-    python scripts/face/download_models.py
-    ```
-  - To test the model (`bash ./scripts/face/test_512.sh`):
-    ```bash
-    #!./scripts/face/test_512.sh
-    python test.py --name edge2face_512 --dataroot datasets/face/ --dataset_mode face --input_nc 15 --loadSize 512 --use_single_G
-    ```
-    The test results will be saved in: `./results/edge2face_512/test_latest/`.
+The yaml configuration file can be located in `./CARLA-vid2vid/carla_settings.yaml/` and it contains the following parameters:
+
+```bash
+connection:
+ ip: 127.0.0.1 #server ip
+ port: 2000 #server port
+ timeout: 10.0 #timeout wait time
+
+world:
+ town: Town01 #the selected carla town (Town01, Town10HD, Town02, ..., etc.)
+ fixed_delta_seconds: 0.05
+ synchronous_mode: True #Synchronous or Asynchronous execution (True or False)
+ weather_preset: ClearNoon #The selected predefined weather presets from the documentations (ClearNoon, ClearSunet, ... , etc.)
+
+general:
+ vehicle: vehicle.tesla.model3 (the selected vehicle from the documentation catalogue)
+ cam_width: 2048 #camera image width
+ cam_height: 1024 #camera image heigh
+ cam_x: 1.5 #x coordinate (location) of the camera
+ cam_z: 1.4 #z coordinate (location) of the camera
+ visualize_results: True #visualize the sensor data and results (original frame, synthesized frame, semantic, and instance segmentation)
+ colorize_masks: False #colorize the grayscale semantic segmentation mask (it will drop the performance)
+ run_model_every_n: 3 #run the moden every 'n' ticks of the world. If set to 1 then it will run for every frame. This can increase the performance (FPS).
+
+dataset:
+ export_data: True #export data on the disk (export location: \datasets\carla\)
+ export_step: 20 #export every 'step' frames
+ capture_when_static: True #export frames when the vehicle is not moving (True or False)
+ speed_threshold: 0.1 #export frames only when a speed threshold is reached
+
+pygame:
+ window_width: 1024 #the width of the pygame window
+ window_height: 512 #the height of the pygame window
+```
+
+### Spawning Traffic and other functionalities
+
+The code works with most of the samples that CARLA already provides in the `\CarlaEXE\PythonAPI\examples` directory. If you want to spawn a variety of vehicles and NPCs in the world, you can easily execute the provided `generate_traffic.py` script. The same is also applicable for dynamic weather via `dynamic_weather.py` and any other functionality that is already provided by the CARLA team.
+
+
+### Visualization (Real-Time) Results
+
+<div align="center">
+  <img src="https://drive.google.com/thumbnail?id=1HKcJ0P6IsfEU4BsCedGS3Sw2uY_KloH8&sz=w1000" alt="Image" width="auto" height="auto">
+</div>
+
+<div align="center">
+  <img src="https://drive.google.com/thumbnail?id=1d42Wj458jblLXzWdsHot7LeSqs6D2Xmf&sz=w1000" alt="Image" width="auto" height="auto">
+</div>
 
 ### Dataset
 - Cityscapes
