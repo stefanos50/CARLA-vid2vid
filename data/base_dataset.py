@@ -29,10 +29,11 @@ class BaseDataset(data.Dataset):
 
         self.seq_idx = 0                                                      # index for current sequence
         self.frame_idx = self.opt.start_frame if not self.opt.isTrain else 0  # index for current frame in the sequence
-        self.frames_count = []                                                # number of frames in each sequence
+        self.frames_count = []
+
         for path in A_paths:
             self.frames_count.append(len(path) - self.opt.n_frames_G + 1)
-
+        print(self.frames_count)
         self.folder_prob = [count / sum(self.frames_count) for count in self.frames_count]
         self.n_frames_total = self.opt.n_frames_total if self.opt.isTrain else 1 
         self.A, self.B, self.I = None, None, None

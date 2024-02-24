@@ -1,0 +1,30 @@
+connection:
+ ip: 127.0.0.1
+ port: 2000
+ timeout: 10.0
+
+world:
+ town: Town10HD
+ fixed_delta_seconds: 0.05
+ synchronous_mode: True
+ weather_preset: ClearNoon
+
+general:
+ vehicle: vehicle.tesla.model3
+ cam_width: 2048
+ cam_height: 1024
+ cam_x: 1.5
+ cam_z: 1.4
+ visualize_results: True #will reduce the performance 
+ colorize_masks: False #will reduce the performance
+ run_model_every_n: 20 #run the moden every 'n' ticks of the world. If set to 1 then it will run for every frame. This can increase the performance.
+
+dataset:
+ export_data: True #will reduce the performance (available only in synchronous mode)
+ export_step: 20
+ capture_when_static: True
+ speed_threshold: 0.1
+
+pygame:
+ window_width: 1024
+ window_height: 512
