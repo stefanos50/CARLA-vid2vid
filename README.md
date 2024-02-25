@@ -72,7 +72,7 @@ world:
  weather_preset: ClearNoon #The selected predefined weather presets from the documentations (ClearNoon, ClearSunet, ... , etc.)
 
 general:
- vehicle: vehicle.tesla.model3 (the selected vehicle from the documentation catalogue)
+ vehicle: vehicle.tesla.model3 #the selected vehicle from the documentation catalogue
  cam_width: 2048 #camera image width
  cam_height: 1024 #camera image heigh
  cam_x: 1.5 #x coordinate (location) of the camera
